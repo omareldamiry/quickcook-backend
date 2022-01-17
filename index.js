@@ -1,13 +1,24 @@
-const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
+const { PrismaClient, Prisma } = require('@prisma/client');
 const prisma = new PrismaClient();
 const user = require('./routes/user');
 const express = require('express');
-const bodyParser = require('body-parser');
 const app = express();
 const bcrypt = require('bcrypt');
 const port = 3000;
 
-app.use(bodyParser.json())
+global.prismaClient = prisma;
+global.bcrypt = bcrypt;
+
+// app.prisma = prisma;
+// prisma1 = prisma;
+// app.bcrypt = bcrypt;
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 async function main() {
   const allAdmins = await prisma.admin.findMany();
@@ -35,6 +46,15 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', user);
+
+app.use((err, req, res, next) => {
+ 
+    console.log(`Custom Try Catch : ${err.message}`);
+    res.status(500).json({
+      message: `Error: ${err.message}`
+    });
+  
+  });
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

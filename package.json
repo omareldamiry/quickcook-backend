@@ -21,7 +21,9 @@
     "@prisma/client": "^3.8.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
-    "express": "^4.17.2"
+    "dotenv": "^14.1.0",
+    "express": "^5.0.0-alpha.8",
+    "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
