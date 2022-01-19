@@ -22,3 +22,10 @@ model User {
   name     String?
   password String?
 }
+
+model Recipe {
+  id Int @id @default(autoincrement())
+  recipeName String
+  desc String?
+  createdAt DateTime @default(now())
+}

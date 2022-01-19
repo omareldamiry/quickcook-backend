@@ -1,7 +1,8 @@
 require('dotenv').config();
-const { PrismaClient, Prisma } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const user = require('./routes/user');
+const admin = require('./routes/admin');
 const express = require('express');
 const app = express();
 const bcrypt = require('bcrypt');
@@ -21,7 +22,11 @@ app.use((req, res, next) => {
 });
 
 async function main() {
-  const allAdmins = await prisma.admin.findMany();
+  const allAdmins = await prisma.admin.findMany({
+    select: {
+      username: true,
+    }
+  });
 
   if(allAdmins.length == 0){
     const password = "pass";
@@ -46,6 +51,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', user);
+app.use('/admin', admin);
 
 app.use((err, req, res, next) => {
  

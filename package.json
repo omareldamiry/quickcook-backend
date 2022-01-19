@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/omareldamiry/quickcook-backend#readme",
   "dependencies": {
-    "@prisma/client": "^3.8.0",
+    "@prisma/client": "^3.8.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
     "dotenv": "^14.1.0",
@@ -27,6 +27,6 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
-    "prisma": "^3.8.0"
+    "prisma": "^3.8.1"
   }
 }
