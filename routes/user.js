@@ -1,16 +1,15 @@
-const bodyParser = require("body-parser");
 const express = require("express");
-const login = require("../util/login");
 const router = express.Router();
+const APIResponse = require("../models/apiresponse");
+const authenticate = require("../utilities/authenticate");
 
-router.use(bodyParser.json());
+router.use(express.json());
 
 router.post('/signup', async (req, res) => {
-
+    
     if (!req.body.email || !req.body.password || !req.body.name) {
-        res.json({
-            message: "Invalid Data",
-        });
+        let apiResponse = new APIResponse(0, "Invalid Data");
+        res.json(apiResponse);
     }
     else {
 
@@ -22,17 +21,32 @@ router.post('/signup', async (req, res) => {
                 name: req.body.name,
             }
         });
-
-        res.json({
-            message: `${req.body.name} signed up!`,
-            content: req.body.email,
-        });
+        let apiResponse = new APIResponse(0, `${req.body.name} signed up!`, req.body.email);
+        res.json(apiResponse);
 
     }
 });
 
 router.post('/login', async (req, res, next) => {
-    await login(req, res, next, "user");
+    const email = req.body.email;
+    const password = req.body.password;
+
+    let auth;
+
+    if (!email || !password) {
+        let apiResponse = new APIResponse(1, "Invalid email or password");
+        res.json(apiResponse);
+    } else {
+
+        auth = await global.prismaClient.user.findUnique({
+            where: {
+                email: req.body.email
+            }
+        });
+
+    }
+
+    await authenticate(auth, password, res);
 });
 
 module.exports = router;
