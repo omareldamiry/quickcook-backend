@@ -9,7 +9,7 @@ const user = require('./routes/user');
 const admin = require('./routes/admin');
 const errHandler =  require('./middlewares/error-handler');
 const cors = require('./middlewares/cors');
-const adminSetup = require('./middlewares/admin-setup');
+const adminSetup = require('./utilities/admin-setup');
 
 const port = 3000;
 
@@ -17,7 +17,7 @@ global.prismaClient = prisma;
 global.bcrypt = bcrypt;
 
 // Sets up the default system admin
-app.use(adminSetup);
+adminSetup();
 
 // Sets up CORS headers
 app.use(cors);
