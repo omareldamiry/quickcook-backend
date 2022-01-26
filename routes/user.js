@@ -44,9 +44,9 @@ router.post('/login', async (req, res, next) => {
             }
         });
 
+        await authenticate(auth, password, res);
     }
 
-    await authenticate(auth, password, res);
 });
 
 module.exports = router;

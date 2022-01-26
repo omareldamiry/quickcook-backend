@@ -12,7 +12,7 @@ router.post('/login', async (req, res, next) => {
     let auth;
 
     if (!username || !password) {
-        let apiResponse = new APIResponse(0, "Invalid username or password");
+        let apiResponse = new APIResponse(1, "Invalid username or password");
         res.status(200).json(apiResponse);
     } else {
         auth = await global.prismaClient.admin.findUnique({
@@ -20,9 +20,9 @@ router.post('/login', async (req, res, next) => {
                 username: req.body.username
             }
         });
+        await authenticate(auth, password, res);
     }
 
-    await authenticate(auth, password, res);
 });
 
 
