@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const APIResponse = require("../models/apiresponse");
-const authenticate = require("../utilities/authenticate");
+const login = require("../utilities/login");
 
 router.use(express.json());
 
@@ -44,7 +44,7 @@ router.post('/login', async (req, res, next) => {
             }
         });
 
-        await authenticate(auth, password, res);
+        await login(auth, password, res);
     }
 
 });

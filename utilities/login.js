@@ -12,7 +12,7 @@ module.exports = async (auth, password, res) => {
             let apiResponse = new APIResponse(1, "Password is incorrect");
             res.json(apiResponse);
         } else {
-            const token = jwt.sign({ email: auth.email || auth.username }, process.env.SECRET_KEY);
+            const token = jwt.sign({ email: auth.email || auth.username }, process.env.SECRET_KEY, { expiresIn: "24h" });
 
             let apiResponse = new APIResponse(0, "Login successfull", token);
             res.status(200).json(apiResponse);

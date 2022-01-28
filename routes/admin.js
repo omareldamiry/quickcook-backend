@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const APIResponse = require('../models/apiresponse');
-const authenticate = require("../utilities/authenticate");
+const login = require("../utilities/login");
 
 router.use(express.json());
 
@@ -20,7 +20,7 @@ router.post('/login', async (req, res, next) => {
                 username: req.body.username
             }
         });
-        await authenticate(auth, password, res);
+        await login(auth, password, res);
     }
 
 });
@@ -55,13 +55,13 @@ router.post('/recipe', async (req, res, next) => {
     res.json(apiResponse);
 });
 
-router.get('/recipes', async (req, res) => {
-    const allRecipes = await global.prismaClient.recipe.findMany();
+// router.get('/recipes', async (req, res) => {
+//     const allRecipes = await global.prismaClient.recipe.findMany();
 
-    let apiResponse = new APIResponse(0, "Successfully fetched all recipes", allRecipes);
-    res.json(apiResponse);
+//     let apiResponse = new APIResponse(0, "Successfully fetched all recipes", allRecipes);
+//     res.json(apiResponse);
 
-});
+// });
 
 router.get('/recipe/:id', async (req, res) => {
 
