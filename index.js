@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const user = require('./routes/user');
 const admin = require('./routes/admin');
 const recipe = require('./routes/recipe');
+const ingredient = require('./routes/ingredient');
 const errHandler =  require('./middlewares/error-handler');
 const cors = require('./middlewares/cors');
 const adminSetup = require('./utilities/admin-setup');
@@ -26,7 +27,8 @@ app.use(cors);
 // Routes
 app.use('/user', user);
 app.use('/admin', admin);
-app.use('/recipes', recipe)
+app.use('/recipes', recipe);
+app.use('/ingredients', ingredient);
 
 // Error handler
 app.use(errHandler);

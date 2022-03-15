@@ -3,11 +3,12 @@ const router = express.Router();
 const APIResponse = require("../models/apiresponse");
 const login = require("../utilities/login");
 
+
 router.use(express.json());
 
 router.post('/signup', async (req, res) => {
     
-    if (!req.body.email || !req.body.password || !req.body.name) {
+    if (!req.body.email || !req.body.password || !req.body.firstName || !req.body.lastName) {
         let apiResponse = new APIResponse(0, "Invalid Data");
         res.json(apiResponse);
     }
@@ -18,10 +19,11 @@ router.post('/signup', async (req, res) => {
             data: {
                 email: req.body.email,
                 password: hashed,
-                name: req.body.name,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
             }
         });
-        let apiResponse = new APIResponse(0, `${req.body.name} signed up!`, req.body.email);
+        let apiResponse = new APIResponse(0, `${req.body.firstName} signed up!`, req.body.email);
         res.json(apiResponse);
 
     }

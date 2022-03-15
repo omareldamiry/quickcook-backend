@@ -5,7 +5,7 @@ const login = require("../utilities/login");
 
 router.use(express.json());
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -39,71 +39,6 @@ router.get('/allusers', async (req, res) => {
     res.json(apiResponse);
 });
 
-router.post('/recipe', async (req, res, next) => {
-    // req.body = { recipeName, desc }
-    const recipeName = req.body.recipeName;
-    const desc = req.body.desc;
 
-    await prisma.recipe.create({
-        data: {
-            recipeName: recipeName,
-            desc: desc
-        }
-    });
-
-    let apiResponse = new APIResponse(0, `${recipeName} recipe created successfully`);
-    res.json(apiResponse);
-});
-
-// router.get('/recipes', async (req, res) => {
-//     const allRecipes = await global.prismaClient.recipe.findMany();
-
-//     let apiResponse = new APIResponse(0, "Successfully fetched all recipes", allRecipes);
-//     res.json(apiResponse);
-
-// });
-
-router.get('/recipe/:id', async (req, res) => {
-
-    const recipe = await global.prismaClient.recipe.findUnique({
-        where: {
-            id: parseInt(req.params.id)
-        }
-    });
-
-    let apiResponse = new APIResponse(0, "Fetched recipe successfully", recipe);
-    res.json(apiResponse);
-
-});
-
-router.put('/recipe/:id', async (req, res) => {
-    // req.body = { recipeName, desc }
-    const recipeName = req.body.recipeName;
-    const desc = req.body.desc;
-
-    await global.prismaClient.recipe.update({
-        where: {
-            id: parseInt(req.params.id)
-        },
-        data: {
-            recipeName: recipeName,
-            desc: desc
-        }
-    });
-
-    let apiResponse = new APIResponse(0, `Recipe ${req.params.id} was updated`);
-    res.json(apiResponse);
-});
-
-router.delete('/recipe/:id', async (req, res) => {
-    await global.prismaClient.recipe.delete({
-        where: {
-            id: parseInt(req.params.id)
-        }
-    });
-
-    let apiResponse = new APIResponse(0, "Recipe deleted");
-    res.json(apiResponse);
-});
 
 module.exports = router;

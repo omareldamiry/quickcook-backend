@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -11,21 +12,44 @@ datasource db {
 }
 
 model Admin {
-  id       Int     @id @default(autoincrement())
-  username String  @unique
-  password String?
+  id        Int     @id @default(autoincrement())
+  username  String  @unique
+  firstName String?
+  lastName  String?
+  password  String
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String?
+  id        Int    @id @default(autoincrement())
+  email     String @unique
+  firstName String
+  lastName  String
+  password  String
 }
 
 model Recipe {
-  id Int @id @default(autoincrement())
-  recipeName String
-  desc String?
-  createdAt DateTime @default(now())
+  id          Int          @id @default(autoincrement())
+  name        String
+  desc        String?
+  ingredients Ingredient[]
+  createdAt   DateTime     @default(now())
+}
+
+model Ingredient {
+  id      Int            @id @default(autoincrement())
+  name    String
+  type    IngredientType @default(Unlisted)
+  recipes Recipe[]
+}
+
+enum IngredientType {
+  Unlisted
+  Dairy
+  Meat
+  Vegetable
+  Fruit
+  Spice
+  Oil
+  Grain
+  Pasta
 }
