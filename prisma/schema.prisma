@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
@@ -20,19 +20,34 @@ model Admin {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  email     String @unique
-  firstName String
-  lastName  String
-  password  String
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  firstName  String
+  lastName   String
+  password   String
+  ratings    Rating[]
+  favourites Recipe[]
+}
+
+model Rating {
+  id       Int    @id @default(autoincrement())
+  value    Float
+  user     User   @relation(references: [id], fields: [userId])
+  recipe   Recipe @relation(references: [id], fields: [recipeId])
+  userId   Int
+  recipeId Int
 }
 
 model Recipe {
-  id          Int          @id @default(autoincrement())
-  name        String
-  desc        String?
-  ingredients Ingredient[]
-  createdAt   DateTime     @default(now())
+  id           Int          @id @default(autoincrement())
+  name         String
+  desc         String?
+  imagePath    String?
+  rating       Float        @default(0.0)
+  ingredients  Ingredient[]
+  ratings      Rating[]
+  favouritedBy User[]
+  createdAt    DateTime     @default(now())
 }
 
 model Ingredient {

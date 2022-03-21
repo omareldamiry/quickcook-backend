@@ -2,22 +2,15 @@ const express = require('express');
 const authenticate = require('../middlewares/authenticate');
 const router = express.Router();
 const APIResponse = require('../models/apiresponse');
-// const queryGenerator = require('../utilities/query generators/query-generator');
 const queryGenerator = require('../utilities/query generators/recipe-query-genrator');
 const {PrismaClient} = require('@prisma/client');
+const res = require('express/lib/response');
 const prisma = new PrismaClient();
 
 router.use(express.json());
 
 router.post('/', authenticate, async (req, res) => {
-    /* Expecting an object of type: RecipeQuery :: req.body.query = {
-        // name: string,
-        ingredients: Ingredient[],
-        // sortDirection: string,
-        // sortField: string,
-        // pageNumber: number,
-        // pageSize: number,
-    } */
+    // Expecting an object of type: RecipeQuery
     const queryBody = req.body.query;
     const generatedQuery = queryGenerator(queryBody);
 
@@ -88,6 +81,29 @@ router.put('/:id', async (req, res) => {
     res.json(apiResponse);
 });
 
+router.put('/:id', async () => {
+    // req.body = { rating: Rating }
+    const rating = req.body.rating;
+    
+    await prisma.recipe.update({
+        where: {
+            id: parseInt(rating.recipeId)
+        },
+        data: {
+            ratings: {
+                upsert: {
+                    where: { id: parseInt(rating.id)},
+                    create: rating,
+                    update: rating
+                }
+            }
+        }
+    });
+
+    let apiResponse = new APIResponse(0, "Updated recipe rating");
+    res.json(apiResponse)
+});
+
 router.delete('/:id', async (req, res) => {
     await global.prismaClient.recipe.delete({
         where: {
@@ -99,6 +115,8 @@ router.delete('/:id', async (req, res) => {
     res.json(apiResponse);
 });
 
+//! TO BE REMOVED
+// @deprecated
 router.post('/search', async (req, res) => {
     // req.body = { ingredients:  number[] }
     const ingredients = req.body.ingredients;

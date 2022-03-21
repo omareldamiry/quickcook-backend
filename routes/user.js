@@ -1,4 +1,5 @@
 const express = require("express");
+const res = require("express/lib/response");
 const router = express.Router();
 const APIResponse = require("../models/apiresponse");
 const login = require("../utilities/login");
@@ -49,6 +50,25 @@ router.post('/login', async (req, res, next) => {
         await login(auth, password, res);
     }
 
+});
+
+router.put('/favorites', async () => {
+    // req.body = { userId: Number, recipeId: Number, action: "connect" | "disconnect" }
+    const { recipeId, userId, action } = req.body;
+
+    await global.prismaClient.user.update({
+        where: {
+            id: parseInt(userId)
+        },
+        data: {
+            favourites: {
+                [action]: { id: recipeId }
+            }
+        }
+    });
+
+    let apiResponse = new APIResponse(0, "Recipe was added to favourites");
+    res.json(apiResponse);
 });
 
 module.exports = router;
