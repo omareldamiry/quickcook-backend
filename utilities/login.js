@@ -14,7 +14,7 @@ module.exports = async (auth, password, res) => {
         } else {
             const token = jwt.sign({ email: auth.email || auth.username }, process.env.SECRET_KEY, { expiresIn: "24h" });
 
-            let apiResponse = new APIResponse(0, "Login successfull", token);
+            let apiResponse = new APIResponse(0, "Login successfull", { token: token, isAdmin: auth.username? true : false });
             res.status(200).json(apiResponse);
         }
     }

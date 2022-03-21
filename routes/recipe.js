@@ -2,38 +2,35 @@ const express = require('express');
 const authenticate = require('../middlewares/authenticate');
 const router = express.Router();
 const APIResponse = require('../models/apiresponse');
+// const queryGenerator = require('../utilities/query generators/query-generator');
+const queryGenerator = require('../utilities/query generators/recipe-query-genrator');
 const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
 router.use(express.json());
 
 router.post('/', authenticate, async (req, res) => {
-    /* Expecting an object of type: RecipeQuery = {
-        name: string,
+    /* Expecting an object of type: RecipeQuery :: req.body.query = {
+        // name: string,
         ingredients: Ingredient[],
-        sortDirection: string,
-        sortField: string,
-        pageNumber: number,
-        pageSize: number,
+        // sortDirection: string,
+        // sortField: string,
+        // pageNumber: number,
+        // pageSize: number,
     } */
-    // const allRecipes = await prisma.recipe.findMany({
-    //     include: {
-    //         ingredients: true
-    //     },
-    //     _relevance: {
-    //         fields: [req.body.sortField],
-    //         sort: sortDirection
-    //     },
-    //     take: req.body.pageSize,
-    //     skip: req.body.pageSize*req.body.pageNumber,
-    // });
-    const allRecipes = await prisma.recipe.findMany({
-        include: {
-            ingredients: true
-        },
+    const queryBody = req.body.query;
+    const generatedQuery = queryGenerator(queryBody);
+
+    const queryResult = await prisma.recipe.findMany(generatedQuery);
+    const queryResultLength = await prisma.recipe.aggregate({
+        where: generatedQuery.where,
+        _count: true,
     });
 
-    let apiResponse = new APIResponse(0, "Successfully fetched all recipes", allRecipes);
+    let apiResponse = new APIResponse(0, `Successfully fetched page ${queryBody.pageNumber} of recipes`, {
+        result: queryResult,
+        length: queryResultLength._count
+    });
     res.json(apiResponse);
 });
 

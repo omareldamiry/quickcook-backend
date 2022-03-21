@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const APIResponse = require('../models/apiresponse');
 const { PrismaClient } = require('@prisma/client');
+const queryGenerator = require('../utilities/query generators/ingredient-query-generator');
 const prisma = new PrismaClient();
 
 router.use(express.json());
@@ -12,33 +13,24 @@ router.get('/', async (req, res) => {
     let apiResponse = new APIResponse(0, "Successfully fetched all ingredients", allIngredients);
     res.json(apiResponse);
 });
-
+// TODO: Internationalize this query structure & add a 'count' operation before pagination.
 router.post('/', async (req, res) => {
     // query: IngredientQuery
-    const query = req.body;
+    const queryBody = req.body;
+    const generatedQuery = queryGenerator(queryBody);
 
-    const queryResult = await prisma.ingredient.findMany({
-        where: {
-            name: {
-                contains: query.name
-            },
-            type: query.ofType,
-        },
-        orderBy: {
-            [query.sortField]: query.sortDirection
-        },
-        skip: query.pageSize*query.pageNumber,
-        take: query.pageSize,
+    const queryResult = await prisma.ingredient.findMany(generatedQuery);
+    const queryResultLength = await prisma.ingredient.aggregate({
+        where: generatedQuery.where,
+        _count: true
     });
 
-    let apiResponse = new APIResponse(0, `Fetched page ${query.pageNumber} of ingredients successfully`, {
+    let apiResponse = new APIResponse(0, `Fetched page ${queryBody.pageNumber} of ingredients successfully`, {
         result: queryResult,
-        length: query.pageSize,
+        length: queryResultLength._count,
     });
 
     res.json(apiResponse);
-
-    console.log(query);
 });
 
 router.post('/ingredient', async (req, res) => {
