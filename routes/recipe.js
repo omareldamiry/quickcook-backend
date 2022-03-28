@@ -3,8 +3,8 @@ const authenticate = require('../middlewares/authenticate');
 const router = express.Router();
 const APIResponse = require('../models/apiresponse');
 const queryGenerator = require('../utilities/query generators/recipe-query-genrator');
+const calculateRating = require('../utilities/calculate-ratings');
 const {PrismaClient} = require('@prisma/client');
-const res = require('express/lib/response');
 const prisma = new PrismaClient();
 
 router.use(express.json());
@@ -13,16 +13,15 @@ router.post('/', authenticate, async (req, res) => {
     // Expecting an object of type: RecipeQuery
     const queryBody = req.body.query;
     const generatedQuery = queryGenerator(queryBody);
-
+    
     const queryResult = await prisma.recipe.findMany(generatedQuery);
-    const queryResultLength = await prisma.recipe.aggregate({
+    const queryResultLength = await prisma.recipe.count({
         where: generatedQuery.where,
-        _count: true,
     });
 
     let apiResponse = new APIResponse(0, `Successfully fetched page ${queryBody.pageNumber} of recipes`, {
         result: queryResult,
-        length: queryResultLength._count
+        length: queryResultLength
     });
     res.json(apiResponse);
 });
@@ -60,6 +59,57 @@ router.get('/:id', async (req, res) => {
 
 // TODO: Use recipe model here
 
+router.put('/rate', async (req, res) => {
+    // req.body = { rating: Rating }
+    const newRating = req.body;
+    const recipeRating = await prisma.recipe.findUnique({
+        where: {
+            id: parseInt(newRating.recipeId)
+        },
+        select: {
+            rating: true,
+            ratings: true,
+        }
+    });
+    try {
+    const recipe = await prisma.recipe.update({
+        where: {
+            id: parseInt(newRating.recipeId)
+        },
+        data: {
+            rating: {
+                set: parseFloat(calculateRating(recipeRating, newRating).toPrecision(2)),
+            },
+            ratings: {
+                upsert: {
+                    create: {
+                        value: newRating.value,
+                        comment: newRating.comment,
+                        userId: parseInt(newRating.userId)
+                    },
+                    update: {
+                        value: newRating.value,
+                        comment: newRating.comment,
+                        userId: parseInt(newRating.userId)
+                    },
+                    where: {
+                        ratingRef: {
+                            recipeId: parseInt(newRating.recipeId),
+                            userId: parseInt(newRating.userId)
+                        }
+                    }
+                }
+            }
+        }
+    }); 
+} catch (err) {
+    console.log(err);
+}
+
+    let apiResponse = new APIResponse(0, "Updated recipe rating");
+    res.json(apiResponse);
+});
+
 router.put('/:id', async (req, res) => {
     // req.body = { name, desc, ingredients }
     const recipe = req.body;
@@ -79,29 +129,6 @@ router.put('/:id', async (req, res) => {
 
     let apiResponse = new APIResponse(0, `Recipe ${req.params.id} was updated`);
     res.json(apiResponse);
-});
-
-router.put('/:id', async () => {
-    // req.body = { rating: Rating }
-    const rating = req.body.rating;
-    
-    await prisma.recipe.update({
-        where: {
-            id: parseInt(rating.recipeId)
-        },
-        data: {
-            ratings: {
-                upsert: {
-                    where: { id: parseInt(rating.id)},
-                    create: rating,
-                    update: rating
-                }
-            }
-        }
-    });
-
-    let apiResponse = new APIResponse(0, "Updated recipe rating");
-    res.json(apiResponse)
 });
 
 router.delete('/:id', async (req, res) => {

@@ -32,10 +32,13 @@ model User {
 model Rating {
   id       Int    @id @default(autoincrement())
   value    Float
+  comment  String?
   user     User   @relation(references: [id], fields: [userId])
   recipe   Recipe @relation(references: [id], fields: [recipeId])
   userId   Int
   recipeId Int
+
+  @@unique([recipeId, userId], name: "ratingRef")
 }
 
 model Recipe {
@@ -43,7 +46,7 @@ model Recipe {
   name         String
   desc         String?
   imagePath    String?
-  rating       Float        @default(0.0)
+  rating       Float        @default(1.0)
   ingredients  Ingredient[]
   ratings      Rating[]
   favouritedBy User[]

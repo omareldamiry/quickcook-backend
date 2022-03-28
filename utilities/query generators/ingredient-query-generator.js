@@ -7,6 +7,7 @@ module.exports = (model) => {
     if(Object.keys(queryData['filter']).length !== 0) {
 
         query.where = {
+            id: queryData.filter.id || undefined,
             name: {
                 contains: queryData.filter.name || undefined,
             },

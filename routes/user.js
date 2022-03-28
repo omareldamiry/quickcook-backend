@@ -1,5 +1,4 @@
 const express = require("express");
-const res = require("express/lib/response");
 const router = express.Router();
 const APIResponse = require("../models/apiresponse");
 const login = require("../utilities/login");
@@ -52,7 +51,7 @@ router.post('/login', async (req, res, next) => {
 
 });
 
-router.put('/favorites', async () => {
+router.put('/favorites', async (req, res) => {
     // req.body = { userId: Number, recipeId: Number, action: "connect" | "disconnect" }
     const { recipeId, userId, action } = req.body;
 
