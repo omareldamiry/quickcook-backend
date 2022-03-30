@@ -20,14 +20,13 @@ router.post('/', async (req, res) => {
     const generatedQuery = queryGenerator(queryBody);
 
     const queryResult = await prisma.ingredient.findMany(generatedQuery);
-    const queryResultLength = await prisma.ingredient.aggregate({
-        where: generatedQuery.where,
-        _count: true
+    const queryResultLength = await prisma.ingredient.count({
+        where: generatedQuery.where
     });
 
     let apiResponse = new APIResponse(0, `Fetched page ${queryBody.pageNumber} of ingredients successfully`, {
         result: queryResult,
-        length: queryResultLength._count,
+        length: queryResultLength,
     });
 
     res.json(apiResponse);

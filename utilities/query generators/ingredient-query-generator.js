@@ -5,13 +5,14 @@ module.exports = (model) => {
     let query = superQueryGenerator(queryData);
 
     if(Object.keys(queryData['filter']).length !== 0) {
+        const { id, name, ofType } = queryData.filter;
 
         query.where = {
-            id: queryData.filter.id || undefined,
+            id: id || undefined,
             name: {
-                contains: queryData.filter.name || undefined,
+                contains: name || undefined,
             },
-            type: queryData.filter.ofType || undefined
+            type: ofType || undefined
         };
 
     }

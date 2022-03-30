@@ -43,6 +43,13 @@ router.post('/login', async (req, res, next) => {
         auth = await global.prismaClient.user.findUnique({
             where: {
                 email: req.body.email
+            },
+            include: {
+                favourites: {
+                    select: {
+                        id: true
+                    }
+                },
             }
         });
 
@@ -51,7 +58,7 @@ router.post('/login', async (req, res, next) => {
 
 });
 
-router.put('/favorites', async (req, res) => {
+router.put('/favourites', async (req, res) => {
     // req.body = { userId: Number, recipeId: Number, action: "connect" | "disconnect" }
     const { recipeId, userId, action } = req.body;
 
@@ -66,7 +73,7 @@ router.put('/favorites', async (req, res) => {
         }
     });
 
-    let apiResponse = new APIResponse(0, "Recipe was added to favourites");
+    let apiResponse = new APIResponse(0, `Updated favourites.`);
     res.json(apiResponse);
 });
 

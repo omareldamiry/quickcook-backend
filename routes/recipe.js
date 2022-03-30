@@ -44,19 +44,6 @@ router.post('/recipe', async (req, res) => {
     res.json(apiResponse);
 });
 
-router.get('/:id', async (req, res) => {
-
-    const recipe = await global.prismaClient.recipe.findUnique({
-        where: {
-            id: parseInt(req.params.id)
-        }
-    });
-
-    let apiResponse = new APIResponse(0, "Fetched recipe successfully", recipe);
-    res.json(apiResponse);
-
-});
-
 // TODO: Use recipe model here
 
 router.put('/rate', async (req, res) => {
@@ -64,7 +51,7 @@ router.put('/rate', async (req, res) => {
     const newRating = req.body;
     const recipeRating = await prisma.recipe.findUnique({
         where: {
-            id: parseInt(newRating.recipeId)
+            id: parseInt(newRating.recipeId),
         },
         select: {
             rating: true,
@@ -72,7 +59,7 @@ router.put('/rate', async (req, res) => {
         }
     });
     try {
-    const recipe = await prisma.recipe.update({
+    await prisma.recipe.update({
         where: {
             id: parseInt(newRating.recipeId)
         },
@@ -166,6 +153,20 @@ router.post('/search', async (req, res) => {
 
     let apiResponse = new APIResponse(0, "Result fetched", recipes);
     res.json(apiResponse);
+});
+
+// @deprecated
+router.get('/:id', async (req, res) => {
+
+    const recipe = await global.prismaClient.recipe.findUnique({
+        where: {
+            id: parseInt(req.params.id)
+        }
+    });
+
+    let apiResponse = new APIResponse(0, "Fetched recipe successfully", recipe);
+    res.json(apiResponse);
+
 });
 
 module.exports = router;

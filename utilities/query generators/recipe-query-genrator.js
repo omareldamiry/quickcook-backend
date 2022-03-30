@@ -3,32 +3,35 @@ const superQueryGenerator = require('./query-generator');
 module.exports = (model) => {
     const queryData = model;
     let query = superQueryGenerator(queryData);
-    
+
     query.include = {
         ingredients: true,
         ratings: true,
     };
-    
+
     if (Object.keys(queryData['filter']).length !== 0) {
-        
-        const ingredientsQuery = queryData.filter.ingredients?.map(ingredient => {
-            return {
-                ingredients: {
-                    some: {
-                        id: ingredient.id
-                    }
+        const { id, name, ingredients, createdAt } = queryData.filter;
+
+        const ingredientsQuery = {
+            some: {
+                id: {
+                    in: ingredients && ingredients.length? ingredients.map(ingredient => ingredient.id) : undefined
                 }
-            };
-        });
-        
+            }
+        };
+
+        console.log(queryData);
+
         query.where = {
-            id: parseInt(queryData.filter.id) || undefined,
-            name: {
-                contains: queryData.filter.name || undefined,
+            id: {
+                in: id? id.map(id => parseInt(id)) : undefined
             },
-            OR: ingredientsQuery?.length ? ingredientsQuery : undefined,
+            name: {
+                contains: name || undefined,
+            },
+            ingredients: ingredientsQuery || undefined,
             createdAt: {
-                gte: queryData.filter.createdAt || undefined
+                gte: createdAt || undefined
             }
         };
     }
